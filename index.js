@@ -16,7 +16,7 @@ axios.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY').then(res => {
     data = res.data;
     const bot = new Telegraf(process.env.BOT_TOKEN)
     bot.start((ctx) => {
-        ctx.reply("Welcome! I will send you the Astronomy Picture of the Day, along with a brief explanation written by a professional astronomer.")
+        ctx.reply("Welcome! I will send you the Astronomy Picture of the Day, along with a brief explanation written by a professional astronomer.\n\nI send the picture everyday at 12:00 AM (GMT +1)\n\nYou can get the picture whenever you want by typing /get")
         cron.schedule("00 12 * * *", function() {
             ctx.replyWithPhoto(data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})
         });
