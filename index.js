@@ -19,13 +19,13 @@ const Chat = mongoose.model('Chat', ChatSchema);
 let data = {};
 const db = mongoose.connection;
 db.once('open', function() {
-    cron.schedule("0 1 * * *", function() {
-        axios.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY').then(res => {
+    cron.schedule("* * * * *", function() {
+        axios.get(`https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`).then(res => {
             data = res.data;
         })
     });
 
-    axios.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY').then(res => {
+    axios.get(`https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`).then(res => {
         data = res.data;
         const bot = new Telegraf(process.env.BOT_TOKEN)
         bot.start((ctx) => {
