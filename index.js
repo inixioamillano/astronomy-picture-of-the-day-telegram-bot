@@ -19,7 +19,7 @@ const Chat = mongoose.model('Chat', ChatSchema);
 let data = {};
 const db = mongoose.connection;
 db.once('open', function() {
-    cron.schedule("1 0 * * *", function() {
+    cron.schedule("0 1 * * *", function() {
         axios.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY').then(res => {
             data = res.data;
         })
