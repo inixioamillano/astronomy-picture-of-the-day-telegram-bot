@@ -76,7 +76,7 @@ db.once('open', function() {
                             })
                         }
                     })      
-                    AdminMessage.updateMany({active: true}, {"$set":{"active": false}})
+                    AdminMessage.updateMany({active: true}, {"$set":{"active": false}}, (err, raw) => {})
                 }
             })
         })
