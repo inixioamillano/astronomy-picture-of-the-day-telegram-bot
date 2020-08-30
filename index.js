@@ -52,6 +52,9 @@ db.once('open', function() {
                 })
             })
         })
+        bot.command('getfromdate', (ctx) => {
+            ctx.reply("This command will be available soon!");
+        })
         cron.schedule("0 12 * * *", () => {
             const telegram = new Telegraf.Telegram(process.env.BOT_TOKEN);
             Chat.find({}, (err, chats) => {
