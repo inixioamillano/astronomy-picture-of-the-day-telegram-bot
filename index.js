@@ -14,7 +14,13 @@ const ChatSchema = new mongoose.Schema({
     username: String
 });
 
+const AdminMessageSchema = new mongoose.Schema({
+    message: String,
+    active: Boolean
+})
+
 const Chat = mongoose.model('Chat', ChatSchema);
+const AdminMessage = mongoose.model('AdminMessage', AdminMessageSchema);
 
 let data = {};
 const db = mongoose.connection;
@@ -54,6 +60,23 @@ db.once('open', function() {
                     chats.map(chat => {
                         telegram.sendPhoto(chat.id, data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})              
                     })
+                }
+            })
+        })
+        cron.schedule("* * * * *", () => {
+            const telegram = new Telegraf.Telegram(process.env.BOT_TOKEN);
+            AdminMessage.find({active: true}, (err, messages) => {
+                if (messages.length > 0){
+                    Chat.find({}, (err, chats) => {
+                        if (!err) {
+                            messages.map(message => {
+                                chats.map(chat => {
+                                    telegram.sendMessage(chat.id, message.message)        
+                                })
+                            })
+                        }
+                    })      
+                    AdminMessage.updateMany({active: true}, {"$set":{"active": false}})
                 }
             })
         })
