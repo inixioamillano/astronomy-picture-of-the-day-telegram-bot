@@ -43,10 +43,11 @@ db.once('open', function() {
             ctx.reply("Welcome! I will send you the Astronomy Picture of the Day, along with a brief explanation written by a professional astronomer.\n\nI send the picture everyday at 12:00 AM (GMT +1)\n\nYou can get the picture whenever you want by typing /get\n\nIf I don't respond, type /start")
         })
         bot.command('get', (ctx) => {
+            const caption = `${data.title} (${data.date})\n\n${data.explanation}`
             if (data.media_type === 'video'){
                 ctx.reply(`${data.title}\n\n${data.explanation}\n\n${data.url}`)
             } else {
-                ctx.replyWithPhoto(data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})
+                ctx.replyWithPhoto(data.url, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})
             }
         });
         bot.command('stop', (ctx) => {
@@ -63,10 +64,11 @@ db.once('open', function() {
             axios.get(`https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}&date=${ctx.message.text}`)
             .then(res => {
                 const {data} = res;
+                const caption = `${data.title} (${data.date})\n\n${data.explanation}`
                 if (data.media_type === 'video'){
                     ctx.reply(`${data.title} (${data.date})\n\n${data.explanation}\n\n${data.url}`)
                 } else {
-                    ctx.replyWithPhoto(data.hdurl, {caption: `${data.title} (${data.date})\n\n${data.explanation}`})
+                    ctx.replyWithPhoto(data.hdurl, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})
                 }
             })
             .catch(e => {
@@ -75,6 +77,7 @@ db.once('open', function() {
         })
         cron.schedule("0 12 * * *", () => {
             const telegram = new Telegraf.Telegram(process.env.BOT_TOKEN);
+            const caption = `${data.title}\n\n${data.explanation}`
             Chat.find({}, (err, chats) => {
                 console.log(`${chats.length} active users`)
                 if (!err) {
@@ -82,7 +85,7 @@ db.once('open', function() {
                         if (data.media_type === 'video'){
                             telegram.sendMessage(`${data.title}\n\n${data.explanation}\n\n${data.url}`)
                         } else {
-                            telegram.sendPhoto(chat.id, data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})     
+                            telegram.sendPhoto(chat.id, data.hdurl, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})     
                         }         
                     })
                 }
