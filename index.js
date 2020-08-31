@@ -79,11 +79,10 @@ db.once('open', function() {
             const telegram = new Telegraf.Telegram(process.env.BOT_TOKEN);
             const caption = `${data.title}\n\n${data.explanation}`
             Chat.find({}, (err, chats) => {
-                console.log(`${chats.length} active users`)
                 if (!err) {
                     chats.map(chat => {
                         if (data.media_type === 'video'){
-                            telegram.sendMessage(`${data.title}\n\n${data.explanation}\n\n${data.url}`)
+                            telegram.sendMessage(chat.id, `${data.title}\n\n${data.explanation}\n\n${data.url}`)
                         } else {
                             telegram.sendPhoto(chat.id, data.hdurl, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})     
                         }         
