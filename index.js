@@ -57,7 +57,21 @@ db.once('open', function() {
             })
         })
         bot.command('getfromdate', (ctx) => {
-            ctx.reply("This command will be available soon!");
+            ctx.reply("Send me a date in the following format: YYYY-MM-DD (for example: 1997-12-03)");
+        })
+        bot.hears(/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/, (ctx) => {
+            axios.get(`https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}&date=${ctx.message.text}`)
+            .then(res => {
+                const {data} = res;
+                if (data.media_type === 'video'){
+                    ctx.reply(`${data.title} (${data.date})\n\n${data.explanation}\n\n${data.url}`)
+                } else {
+                    ctx.replyWithPhoto(data.hdurl, {caption: `${data.title} (${data.date})\n\n${data.explanation}`})
+                }
+            })
+            .catch(e => {
+                ctx.reply(`${ctx.message.text} is not a valid date. Date must be between Jun 16, 1995 and today.`)
+            })
         })
         cron.schedule("0 12 * * *", () => {
             const telegram = new Telegraf.Telegram(process.env.BOT_TOKEN);
