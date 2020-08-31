@@ -4,7 +4,7 @@ const axios = require("axios");
 const mongoose = require("mongoose")
 const dotenv = require('dotenv');
 dotenv.config();
-mongoose.connect(`mongodb://${process.env.MONGO_URL}/telegramastrobot`, {useNewUrlParser: true});
+mongoose.connect(`mongodb://${process.env.MONGO_URL}/telegramastrobot`,  {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 const ChatSchema = new mongoose.Schema({
     id: {
@@ -48,6 +48,10 @@ db.once('open', function() {
                 ctx.reply(`${data.title}\n\n${data.explanation}\n\n${data.url}`)
             } else {
                 ctx.replyWithPhoto(data.url, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})
+                .catch(e => {
+                    ctx.replyWithPhoto(data.url, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})
+                    .catch(e => ctx.reply("Please, try again later."))    
+                })
             }
         });
         bot.command('stop', (ctx) => {
@@ -69,6 +73,10 @@ db.once('open', function() {
                     ctx.reply(`${data.title} (${data.date})\n\n${data.explanation}\n\n${data.url}`)
                 } else {
                     ctx.replyWithPhoto(data.hdurl, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})
+                    .catch(e => {
+                        ctx.replyWithPhoto(data.url, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})
+                        .catch(e => ctx.reply("Please, try again later."))    
+                    })
                 }
             })
             .catch(e => {
@@ -84,7 +92,11 @@ db.once('open', function() {
                         if (data.media_type === 'video'){
                             telegram.sendMessage(chat.id, `${data.title}\n\n${data.explanation}\n\n${data.url}`)
                         } else {
-                            telegram.sendPhoto(chat.id, data.hdurl, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})     
+                            telegram.sendPhoto(chat.id, data.hdurl, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})    
+                            .catch(e => {
+                                telegram.sendPhoto(chat.id, data.url, {caption: caption.length > 1024 ? caption.substring(0,1020)+"..." : caption})    
+                                .catch(e => ctx.reply("Please, try again later."))    
+                            }) 
                         }         
                     })
                 }
