@@ -43,7 +43,11 @@ db.once('open', function() {
             ctx.reply("Welcome! I will send you the Astronomy Picture of the Day, along with a brief explanation written by a professional astronomer.\n\nI send the picture everyday at 12:00 AM (GMT +1)\n\nYou can get the picture whenever you want by typing /get\n\nIf I don't respond, type /start")
         })
         bot.command('get', (ctx) => {
-            ctx.replyWithPhoto(data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})
+            if (data.media_type === 'video'){
+                ctx.reply(`${data.title}\n\n${data.explanation}\n\n${data.url}`)
+            } else {
+                ctx.replyWithPhoto(data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})
+            }
         });
         bot.command('stop', (ctx) => {
             ctx.getChat().then(chat => {
@@ -61,7 +65,11 @@ db.once('open', function() {
                 console.log(`${chats.length} active users`)
                 if (!err) {
                     chats.map(chat => {
-                        telegram.sendPhoto(chat.id, data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})              
+                        if (data.media_type === 'video'){
+                            telegram.sendMessage(`${data.title}\n\n${data.explanation}\n\n${data.url}`)
+                        } else {
+                            telegram.sendPhoto(chat.id, data.hdurl, {caption: `${data.title}\n\n${data.explanation}`})     
+                        }         
                     })
                 }
             })
